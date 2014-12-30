@@ -7,6 +7,5 @@ SQLAlchemy==0.9.8
 testing.postgresql==1.1.0
 transaction==1.4.3
 wheel==0.24.0
-wsgiref==0.1.2
 zope.interface==4.1.2
 zope.sqlalchemy==0.7.5
