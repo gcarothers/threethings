@@ -1,9 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from collections import (
-    defaultdict,
-)
-
 from sqlalchemy import (
     Column,
     Integer,
@@ -18,11 +14,8 @@ from sqlalchemy.orm import (
     sessionmaker,
     relation,
 )
-from zope.sqlalchemy import ZopeTransactionExtension, mark_changed
-import transaction
-from sqlalchemy.dialects.postgresql import (
-    JSONB,
-)
+from zope.sqlalchemy import ZopeTransactionExtension
+
 from sqlalchemy.ext.declarative import (
     declarative_base,
 )
@@ -42,6 +35,7 @@ Base = declarative_base()
 now = partial(datetime.datetime.now, tz=pytz.UTC)
 
 FRIDAY = 5
+
 
 class StatusUpdate(Base):
     __tablename__ = 'status_updates'
@@ -90,7 +84,7 @@ class User(Base):
             if self.is_after_expected_update_time(when):
                 log.debug("last_notified: %r", self.last_notified)
                 if self.last_notified is None or (self.last_notified - when >
-                                                 datetime.timedelta(hours=24)):
+                                                  datetime.timedelta(hours=24)):
                     if self.update_for_week(when).count() == 0:
                         return True
 
@@ -99,7 +93,6 @@ class User(Base):
         q = q.join(self.__class__)
         q = q.filter(self.__class__.email_address == self.email_address)
         return q
-
 
     def is_after_expected_update_time(self, when):
         localtime = self.in_localtime(when)
@@ -118,7 +111,6 @@ class User(Base):
         tz = pytz.timezone(self.timezone)
         localtime = when.astimezone(tz)
         return localtime
-
 
 
 class WeeklySummary(object):
