@@ -11,16 +11,12 @@ from threethings.threethings import (
     Session,
     Base,
     User,
-    StatusUpdate,
-)
-
-from sqlalchemy import (
-    text,
 )
 
 from zope.sqlalchemy import mark_changed
 
 import iso8601
+import datetime
 
 import transaction
 
@@ -31,15 +27,17 @@ import logging
 
 log = logging.getLogger(__name__)
 
-
 postgres_instance = None
+
 
 def setup_module():
     create_database()
 
+
 def teardown_module():
     global postgres_instance
     postgres_instance.stop()
+
 
 def create_database():
     from sqlalchemy import create_engine
@@ -48,6 +46,7 @@ def create_database():
     engine = create_engine(postgres_instance.url())
     Session.configure(bind=engine)
     Base.metadata.create_all(engine)
+
 
 def create_data():
     with transaction.manager:
@@ -61,6 +60,7 @@ def create_data():
         Session.add(singapore_user)
         transaction.commit()
 
+
 def remove_data():
     with transaction.manager:
         for table in reversed(Base.metadata.sorted_tables):
@@ -68,11 +68,22 @@ def remove_data():
             mark_changed(Session.registry())
         transaction.commit()
 
+
+def fake_last_notification(when):
+    with transaction.manager:
+        users = Session.query(User)
+        for user in users:
+            log.debug("Setting notification for %r to %r", user, when)
+            user.last_notified = when
+        transaction.commit()
+
+
 @with_setup(create_data, remove_data)
 def test_notify_on_friday_afternoon():
     dt = iso8601.parse_date("2015-02-06T22:00:00Z")
     to_be_notified = list(User.to_notify(dt))
     eq_(len(to_be_notified), 2)
+
 
 @with_setup(create_data, remove_data)
 def test_notify_on_friday_afternoon_singapore():
@@ -80,3 +91,10 @@ def test_notify_on_friday_afternoon_singapore():
     to_be_notified = list(User.to_notify(dt))
     eq_(len(to_be_notified), 1)
 
+
+@with_setup(create_data, remove_data)
+def test_notify_on_friday_afternoon_after_already_sending_some():
+    dt = iso8601.parse_date("2015-02-06T22:00:00Z")
+    fake_last_notification(dt - datetime.timedelta(hours=4))
+    to_be_notified = list(User.to_notify(dt))
+    eq_(len(to_be_notified), 0)

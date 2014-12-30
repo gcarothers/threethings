@@ -66,7 +66,7 @@ class User(Base):
     email_address = Column(Text, primary_key=True)
     timezone = Column(Text, nullable=False)
     notifications_on = Column(Boolean, nullable=False, default=True)
-    last_notifed = Column(DateTime(timezone=True))
+    last_notified = Column(DateTime(timezone=True))
 
     status_updates = relation(StatusUpdate, backref='user')
 
@@ -88,7 +88,8 @@ class User(Base):
         if self.notifications_on:
             log.debug("Set for notifications: %r", self)
             if self.is_after_expected_update_time(when):
-                if self.last_notifed is None or (self.last_notifed - when >
+                log.debug("last_notified: %r", self.last_notified)
+                if self.last_notified is None or (self.last_notified - when >
                                                  datetime.timedelta(hours=24)):
                     if self.update_for_week(when).count() == 0:
                         return True
@@ -104,7 +105,7 @@ class User(Base):
         localtime = self.in_localtime(when)
         day = localtime.isoweekday()
         hour = localtime.hour
-        log.debug(localtime)
+        log.debug("Local time for %r is %s", self, localtime)
         if day == FRIDAY and hour >= 15:
             return True
         elif day > FRIDAY:
