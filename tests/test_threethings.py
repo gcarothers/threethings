@@ -11,6 +11,7 @@ from threethings.threethings import (
     Session,
     Base,
     User,
+    StatusUpdate,
 )
 
 from zope.sqlalchemy import mark_changed
@@ -98,3 +99,19 @@ def test_notify_on_friday_afternoon_after_already_sending_some():
     fake_last_notification(dt - datetime.timedelta(hours=4))
     to_be_notified = list(User.to_notify(dt))
     eq_(len(to_be_notified), 0)
+
+
+@with_setup(create_data, remove_data)
+def test_notify_on_only_those_without_status_for_week():
+    dt = iso8601.parse_date("2015-02-06T22:00:00Z")
+
+    with transaction.manager:
+        user = Session.query(User).get("singapore@example.com")
+        update = StatusUpdate()
+        update.status = "Did some work"
+        update.when = dt - datetime.timedelta(hours=12)
+        update.user = user
+        transaction.commit()
+
+    to_be_notified = list(User.to_notify(dt))
+    eq_(len(to_be_notified), 1)
