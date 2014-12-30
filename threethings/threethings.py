@@ -18,7 +18,7 @@ from sqlalchemy.orm import (
     sessionmaker,
     relation,
 )
-from zope.sqlalchemy import ZopeTransactionExtension
+from zope.sqlalchemy import ZopeTransactionExtension, mark_changed
 import transaction
 from sqlalchemy.dialects.postgresql import (
     JSONB,
