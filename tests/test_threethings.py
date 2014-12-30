@@ -7,7 +7,7 @@ test_threethings
 Tests for `threethings` module.
 """
 
-from threethings.threethings import (
+from threethings.model import (
     Session,
     Base,
     User,
