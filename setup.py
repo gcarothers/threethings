@@ -12,11 +12,15 @@ readme = open('README.rst').read()
 history = open('HISTORY.rst').read().replace('.. :changelog:', '')
 
 requirements = [
-    # TODO: put package requirements here
+    'sqlalchemy',
+    'pytz',
+    'zope.sqlalchemy',
+    'transaction',
+    'iso8601',
 ]
 
 test_requirements = [
-    # TODO: put package test requirements here
+    'testing.postgresql',
 ]
 
 setup(
