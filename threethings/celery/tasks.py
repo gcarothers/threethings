@@ -1,1 +1,1 @@
-
+"""Each celery task"""
