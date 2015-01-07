@@ -12,6 +12,7 @@ readme = open('README.rst').read()
 history = open('HISTORY.rst').read().replace('.. :changelog:', '')
 
 requirements = [
+    'argh',
     'sqlalchemy',
     'pytz',
     'zope.sqlalchemy',
@@ -59,7 +60,7 @@ setup(
     tests_require=test_requirements,
     entry_points="""
     [console_scripts]
-    threethings-celery=threethings.celery:main
+    3things=threethings.cli:main
     [paste.app_factory]
     main = threethings.web:main
     """,
