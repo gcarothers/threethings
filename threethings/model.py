@@ -53,6 +53,14 @@ class StatusUpdate(Base):
         q = q.filter(func.date_part('week', cls.when) == for_week)
         return q
 
+    @classmethod
+    def from_email(cls, author, text, when):
+        update = StatusUpdate()
+        update.status = text
+        update.when = when
+        update.email_address = author
+        Session.add(update)
+
 
 class User(Base):
     __tablename__ = 'users'
