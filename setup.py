@@ -18,10 +18,7 @@ requirements = [
     'transaction',
     'iso8601',
     'pyramid',
-    'pyramid_celery',
     'pyramid_tm',
-    'celery',
-    'redis',
 ]
 
 test_requirements = [
