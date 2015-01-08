@@ -18,6 +18,11 @@ def _setup_database(db_url):
     Base.metadata.bind = engine
 
 
+def create_schema(db_url=DEFAULT_DATABASE_URL):
+    _setup_database(db_url)
+    Base.metadata.create_all()
+
+
 def add_user(email_address,
              timezone='America/Los_Angeles',
              db_url=DEFAULT_DATABASE_URL):
@@ -48,6 +53,7 @@ parser = argh.ArghParser()
 parser.add_commands([
     add_user,
     remove_user,
+    create_schema,
 ])
 
 def main():
