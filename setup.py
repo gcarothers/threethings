@@ -18,6 +18,7 @@ requirements = [
     'zope.sqlalchemy',
     'transaction',
     'iso8601',
+    'python-dateutil',
     'pyramid',
     'pyramid_tm',
 ]
