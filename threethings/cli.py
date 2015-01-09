@@ -15,6 +15,7 @@ from .model import (
 )
 from .email import (
     send_notification,
+    from_config,
 )
 from dateutil.parser import (
     parse,
@@ -23,6 +24,7 @@ import pytz
 import transaction
 
 DEFAULT_DATABASE_URL='postgresql://threethings@127.0.0.1:5432/threethings-dev'
+DEFAULT_MANDRILL_TEST_KEY='HONFNmswdL6K075sBSk1-g'
 DEFAULT_CONFIG_PATH='~/.config/3things.json'
 
 
@@ -36,9 +38,13 @@ def _setup_database(db_url):
 def _setup_from_config(config_path):
     from sqlalchemy import engine_from_config
     config = _load_config(config_path)
+
     engine = engine_from_config(config['database'], prefix='')
     Session.configure(bind=engine)
     Base.metadata.bind = engine
+
+    from_config(config['email'])
+
 
 
 def _load_config(config_path):
@@ -57,15 +63,22 @@ def create_schema(config=DEFAULT_CONFIG_PATH):
     _setup_from_config(config)
     Base.metadata.create_all()
 
+def _ask_with_default(name, default):
+    result = safe_input("{} [{}]: ".format(name, default))
+    if result is "":
+        result = default
+    return result
 
 def config(path=DEFAULT_CONFIG_PATH):
-    database_url = safe_input("Database URL [{}]: ".format(DEFAULT_DATABASE_URL))
-    if database_url is "":
-        database_url = DEFAULT_DATABASE_URL
+    database_url = _ask_with_default("Database URL", DEFAULT_DATABASE_URL)
+    api_key = _ask_with_default("Mandrill API Key", DEFAULT_MANDRILL_TEST_KEY)
 
     config = {
         'database': {
             'url': database_url,
+        },
+        'email':{
+            'apiKey': api_key,
         },
     }
     _write_config(config,
@@ -81,7 +94,7 @@ def add_user(email_address,
         user.timezone = timezone
         Session.add(user)
         transaction.commit()
-    print("Added: {}".format(email_address))
+    yield "Added: {}".format(email_address)
 
 
 def remove_user(email_address,
@@ -92,12 +105,13 @@ def remove_user(email_address,
         if user:
             Session.delete(user)
             transaction.commit()
-            print("Removed: {}".format(email_address))
+            yield "Removed: {}".format(email_address)
         else:
-            print("No such user: {}".format(email_address))
+            yield "No such user: {}".format(email_address)
 
 
 def send_reminders(date_override=None,
+                   force=False,
                    timezone="UTC",
                    config=DEFAULT_CONFIG_PATH):
     _setup_from_config(config)
@@ -108,11 +122,13 @@ def send_reminders(date_override=None,
             when = zone.localize(when)
     else:
         when = now()
-    who = User.to_notify(when)
-    print("Sending notifications for {}".format(when))
-    for user in who:
-        print("Sending notification for: {}".format(user.email_address))
-        send_notification(user, when)
+    with transaction.manager:
+        who = User.to_notify(when, force=force)
+        yield "Sending notifications for {}".format(when)
+        for user in who:
+            yield "Sending notification for: {}".format(user.email_address)
+            send_notification(user, when)
+        transaction.commit()
 
 
 parser = argh.ArghParser()

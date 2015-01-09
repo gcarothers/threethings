@@ -77,13 +77,13 @@ class User(Base):
         return "<{}('{}')>".format(cls_name, self.email_address)
 
     @classmethod
-    def to_notify(cls, when=None):
+    def to_notify(cls, when=None, force=False):
         if when is None:
             when = now()
 
         all_users = Session.query(cls)
         for user in all_users:
-            if user.should_be_notified(when):
+            if user.should_be_notified(when) or force:
                 yield user
 
     def should_be_notified(self, when):
@@ -91,7 +91,7 @@ class User(Base):
             log.debug("Set for notifications: %r", self)
             if self.is_after_expected_update_time(when):
                 log.debug("last_notified: %r", self.last_notified)
-                if self.last_notified is None or (self.last_notified - when >
+                if self.last_notified is None or (when - self.last_notified >
                                                   datetime.timedelta(hours=24)):
                     if self.update_for_week(when).count() == 0:
                         return True
