@@ -12,6 +12,9 @@ from ..model import (
 def main(global_config, **settings):
     """This functions returns a Pyramid WSGI application"""
 
+    if os.environ.get('DATABASE_URL') is not None:
+        settings['sqlalchemy.url'] = os.environ.get('DATABASE_URL')
+
     engine = engine_from_config(settings, 'sqlalchemy.')
     Session.configure(bind=engine)
     Base.metadata.bind = engine
