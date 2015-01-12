@@ -1,4 +1,4 @@
 #!/bin/sh
 set -e
-python setup.py develop
+pip install -e .
 python heroku-run.py

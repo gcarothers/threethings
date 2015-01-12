@@ -39,6 +39,9 @@ def _setup_from_config(config_path):
     from sqlalchemy import engine_from_config
     config = _load_config(config_path)
 
+    if os.environ.get('DATABASE_URL') is not None:
+        config['database']['url'] = os.environ.get('DATABASE_URL')
+
     engine = engine_from_config(config['database'], prefix='')
     Session.configure(bind=engine)
     Base.metadata.bind = engine
