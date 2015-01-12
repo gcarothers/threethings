@@ -55,7 +55,6 @@ def _load_config(config_path):
     if os.path.exists(path):
         with open(path) as config_file:
             config = json.load(config_file)
-        return config
     else:
         config = {
             'database': {
@@ -65,6 +64,7 @@ def _load_config(config_path):
                 'apiKey': DEFAULT_MANDRILL_TEST_KEY,
             },
         }
+    return config
 
 def _write_config(config, config_path):
     path = os.path.expanduser(config_path)
