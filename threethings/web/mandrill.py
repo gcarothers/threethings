@@ -10,9 +10,6 @@ from pyramid.view import (
 from pyramid.response import (
     Response,
 )
-from pyramid.httpexceptions import (
-    HTTPOk,
-)
 from ..model import (
     StatusUpdate,
 )

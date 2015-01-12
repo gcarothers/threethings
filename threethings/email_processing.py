@@ -1,10 +1,12 @@
 import mandrill
 
-Client = None # mandrill.Mandrill()
+Client = None  # mandrill.Mandrill()
+
 
 def from_config(config):
     global Client
     Client = mandrill.Mandrill(config['apiKey'])
+
 
 def send_notification(user, for_week):
     year, week_number, day_number = for_week.isocalendar()
@@ -12,7 +14,7 @@ def send_notification(user, for_week):
         'from_email': 'status-update@in.lexmachina.com',
         'from_name': '3things Status Updates',
         'tags': ['3things', 'status-update'],
-        'to':[
+        'to': [
             {
                 'email': user.email_address,
             },

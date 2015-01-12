@@ -3,8 +3,6 @@ import os.path
 import argh
 import json
 from argh import (
-    arg,
-    confirm,
     safe_input,
 )
 from .model import (
@@ -23,9 +21,12 @@ from dateutil.parser import (
 import pytz
 import transaction
 
-DEFAULT_DATABASE_URL='postgresql://threethings@127.0.0.1:5432/threethings-dev'
-DEFAULT_MANDRILL_TEST_KEY='HONFNmswdL6K075sBSk1-g'
-DEFAULT_CONFIG_PATH='~/.config/3things.json'
+DEFAULT_DATABASE_URL = 'postgresql://threethings@127.0.0.1:5432/threethings-dev'
+DEFAULT_MANDRILL_TEST_KEY = 'HONFNmswdL6K075sBSk1-g'
+DEFAULT_CONFIG_PATH = '~/.config/3things.json'
+
+import logging
+logging.basicConfig(level=logging.DEBUG)
 
 
 def _setup_database(db_url):
@@ -49,12 +50,12 @@ def _setup_from_config(config_path):
     from_config(config['email'])
 
 
-
 def _load_config(config_path):
     path = os.path.expanduser(config_path)
     with open(path) as config_file:
         config = json.load(config_file)
     return config
+
 
 def _write_config(config, config_path):
     path = os.path.expanduser(config_path)
@@ -66,11 +67,13 @@ def create_schema(config=DEFAULT_CONFIG_PATH):
     _setup_from_config(config)
     Base.metadata.create_all()
 
+
 def _ask_with_default(name, default):
     result = safe_input("{} [{}]: ".format(name, default))
     if result is "":
         result = default
     return result
+
 
 def config(path=DEFAULT_CONFIG_PATH):
     database_url = _ask_with_default("Database URL", DEFAULT_DATABASE_URL)
@@ -80,12 +83,13 @@ def config(path=DEFAULT_CONFIG_PATH):
         'database': {
             'url': database_url,
         },
-        'email':{
+        'email': {
             'apiKey': api_key,
         },
     }
     _write_config(config,
                   config_path=path)
+
 
 def add_user(email_address,
              timezone='America/Los_Angeles',
@@ -142,6 +146,7 @@ parser.add_commands([
     create_schema,
     send_reminders,
 ])
+
 
 def main():
     parser.dispatch()
