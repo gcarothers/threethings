@@ -13,6 +13,9 @@ from pyramid.response import (
 from ..model import (
     StatusUpdate,
 )
+from ..email_processing import (
+    send_confirm,
+)
 
 import logging
 
@@ -52,4 +55,5 @@ def process_inbound_email(email_json):
         text = msg['text']
         html = msg['html']
         update = StatusUpdate.from_email(author, timestamp, text, html)
+        send_confirm(author)
         yield update

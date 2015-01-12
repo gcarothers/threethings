@@ -37,3 +37,28 @@ Friendly Robot
         raise Exception("%r".format(result))
     user.last_notified = for_week
     return result
+
+
+def send_confirm(user):
+    message = {
+        'from_email': 'status-update@in.lexmachina.com',
+        'from_name': '3things Status Updates',
+        'tags': ['3things', 'status-update'],
+        'to': [
+            {
+                'email': user.email_address,
+            },
+        ],
+        'subject': 'Got your update!',
+        'text': """
+Thanks! I've got it.
+
+Cheers,
+Friendly Robot
+""",
+    }
+    results = Client.messages.send(message)
+    result = results[0]
+    if result['status'] != 'sent':
+        raise Exception("%r".format(result))
+    return result
