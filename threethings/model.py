@@ -61,6 +61,7 @@ class StatusUpdate(Base):
         update.when = when
         update.email_address = author
         Session.add(update)
+        return update
 
     def __json__(self, request):
         return {
