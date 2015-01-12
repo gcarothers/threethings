@@ -13,6 +13,7 @@ history = open('HISTORY.rst').read().replace('.. :changelog:', '')
 
 requirements = [
     'argh',
+    'mandrill',
     'sqlalchemy',
     'pytz',
     'zope.sqlalchemy',
@@ -25,6 +26,7 @@ requirements = [
 
 test_requirements = [
     'testing.postgresql',
+    'nose',
     'pyramid_debugtoolbar',
 ]
 
