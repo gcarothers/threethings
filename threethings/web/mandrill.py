@@ -33,12 +33,14 @@ def webhook_allowed(request):
     return Response(status=200)
 
 
-@view_config(route_name='mandrill_receiving', request_method='POST')
+@view_config(route_name='mandrill_receiving',
+             request_method='POST',
+             renderer='json')
 def receive_email(request):
     mandrill_events = request.params['mandrill_events']
     email_json = json.loads(mandrill_events)
-    process_inbound_email(email_json)
-    return HTTPOk()
+    updates = process_inbound_email(email_json)
+    return list(updates)
 
 
 def process_inbound_email(email_json):

@@ -61,6 +61,14 @@ class StatusUpdate(Base):
         update.email_address = author
         Session.add(update)
 
+    def __json__(self, request):
+        return {
+            'id': self.id,
+            'email': self.email_address,
+            'status': self.status,
+            'when': self.when.isoformat()
+        }
+
 
 class User(Base):
     __tablename__ = 'users'
