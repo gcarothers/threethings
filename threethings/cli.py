@@ -52,10 +52,19 @@ def _setup_from_config(config_path):
 
 def _load_config(config_path):
     path = os.path.expanduser(config_path)
-    with open(path) as config_file:
-        config = json.load(config_file)
-    return config
-
+    if os.path.exists(path):
+        with open(path) as config_file:
+            config = json.load(config_file)
+        return config
+    else:
+        config = {
+            'database': {
+                'url': DEFAULT_DATABASE_URL,
+            },
+            'email': {
+                'apiKey': DEFAULT_MANDRILL_TEST_KEY,
+            },
+        }
 
 def _write_config(config, config_path):
     path = os.path.expanduser(config_path)
