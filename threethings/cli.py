@@ -63,8 +63,11 @@ def _write_config(config, config_path):
         json.dump(config, config_file)
 
 
-def create_schema(config=DEFAULT_CONFIG_PATH):
+def create_schema(config=DEFAULT_CONFIG_PATH,
+                  reset=False):
     _setup_from_config(config)
+    if reset:
+        Base.metadata.drop_all()
     Base.metadata.create_all()
 
 
