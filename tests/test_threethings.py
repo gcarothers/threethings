@@ -108,7 +108,7 @@ def test_notify_on_only_those_without_status_for_week():
     with transaction.manager:
         user = Session.query(User).get("singapore@example.com")
         update = StatusUpdate()
-        update.status = "Did some work"
+        update.raw_text = "Did some work"
         update.when = dt - datetime.timedelta(hours=12)
         update.user = user
         transaction.commit()

@@ -13,7 +13,7 @@ from .model import (
     User,
     now,
 )
-from .email import (
+from .email_processing import (
     send_notification,
     from_config,
 )
