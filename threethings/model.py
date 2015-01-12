@@ -42,7 +42,8 @@ class StatusUpdate(Base):
 
     id = Column(Integer, primary_key=True)
     email_address = Column(Text, ForeignKey('users.email_address'))
-    status = Column(Text, nullable=False)
+    raw_text = Column(Text, nullable=False)
+    raw_html = Column(Text, nullable=True)
     when = Column(DateTime(timezone=True), nullable=False, default=now)
 
     @classmethod
@@ -56,7 +57,7 @@ class StatusUpdate(Base):
     @classmethod
     def from_email(cls, author, text, when):
         update = StatusUpdate()
-        update.status = text
+        update.raw_text = text
         update.when = when
         update.email_address = author
         Session.add(update)
@@ -65,7 +66,6 @@ class StatusUpdate(Base):
         return {
             'id': self.id,
             'email': self.email_address,
-            'status': self.status,
             'when': self.when.isoformat()
         }
 
