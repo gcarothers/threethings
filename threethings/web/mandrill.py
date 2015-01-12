@@ -55,5 +55,5 @@ def process_inbound_email(email_json):
         text = msg['text']
         html = msg['html']
         update = StatusUpdate.from_email(author, timestamp, text, html)
-        send_confirm(author)
+        send_confirm(update.user)
         yield update
