@@ -55,7 +55,7 @@ class StatusUpdate(Base):
         return q
 
     @classmethod
-    def from_email(cls, author, text, when):
+    def from_email(cls, author, when, text, html=None):
         update = StatusUpdate()
         update.raw_text = text
         update.when = when

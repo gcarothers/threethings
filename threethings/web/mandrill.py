@@ -53,5 +53,6 @@ def process_inbound_email(email_json):
         msg = event['msg']
         author = msg['from_email']
         text = msg['text']
-        update = StatusUpdate.from_email(author, text, timestamp)
+        html = msg['html']
+        update = StatusUpdate.from_email(author, timestamp, text, html)
         yield update
