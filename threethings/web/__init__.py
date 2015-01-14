@@ -1,6 +1,5 @@
 """Web Application"""
 
-import os
 from pyramid.config import Configurator
 from sqlalchemy import engine_from_config
 
@@ -9,17 +8,23 @@ from ..model import (
     Base,
 )
 
+from ..settings_utils import(
+    load_settings_from_environ,
+    ENVIRON_SETTINGS_MAP,
+)
+
 
 def main(global_config, **settings):
     """This functions returns a Pyramid WSGI application"""
 
-    if os.environ.get('DATABASE_URL') is not None:
-        settings['sqlalchemy.url'] = os.environ.get('DATABASE_URL')
+    load_settings_from_environ(settings, ENVIRON_SETTINGS_MAP)
 
     engine = engine_from_config(settings, 'sqlalchemy.')
     Session.configure(bind=engine)
     Base.metadata.bind = engine
 
     config = Configurator(settings=settings)
+    config.include('pyramid_tm')
+    config.include('pyramid_mailer')
     config.include('.mandrill', route_prefix="/mandrill")
     return config.make_wsgi_app()

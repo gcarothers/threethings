@@ -11,9 +11,16 @@ from .model import (
     User,
     now,
 )
+
+from .settings_utils import(
+    load_settings_from_environ,
+    ENVIRON_SETTINGS_MAP,
+)
+from pyramid_mailer import (
+    mailer_factory_from_settings,
+)
 from .email_processing import (
     send_notification,
-    from_config,
 )
 from dateutil.parser import (
     parse,
@@ -22,11 +29,21 @@ import pytz
 import transaction
 
 DEFAULT_DATABASE_URL = 'postgresql://threethings@127.0.0.1:5432/threethings-dev'
+DEFAULT_MANDRILL_USERNAME = 'username'
 DEFAULT_MANDRILL_TEST_KEY = 'HONFNmswdL6K075sBSk1-g'
 DEFAULT_CONFIG_PATH = '~/.config/3things.json'
 
+DEFAULT_CONFIGURATION = {
+    'sqlalchemy.url': DEFAULT_DATABASE_URL,
+    'mail.host': 'smtp.mandrillapp.com',
+    'mail.port': 2525,
+    'mail.ssl': True,
+}
+
 import logging
 logging.basicConfig(level=logging.DEBUG)
+
+cli_mailer = None
 
 
 def _setup_database(db_url):
@@ -39,15 +56,13 @@ def _setup_database(db_url):
 def _setup_from_config(config_path):
     from sqlalchemy import engine_from_config
     config = _load_config(config_path)
-
-    if os.environ.get('DATABASE_URL') is not None:
-        config['database']['url'] = os.environ.get('DATABASE_URL')
-
-    engine = engine_from_config(config['database'], prefix='')
+    load_settings_from_environ(config, ENVIRON_SETTINGS_MAP)
+    engine = engine_from_config(config, prefix='sqlalchemy.')
     Session.configure(bind=engine)
     Base.metadata.bind = engine
 
-    from_config(config['email'])
+    global cli_mailer
+    cli_mailer = mailer_factory_from_settings(config)
 
 
 def _load_config(config_path):
@@ -56,20 +71,15 @@ def _load_config(config_path):
         with open(path) as config_file:
             config = json.load(config_file)
     else:
-        config = {
-            'database': {
-                'url': DEFAULT_DATABASE_URL,
-            },
-            'email': {
-                'apiKey': DEFAULT_MANDRILL_TEST_KEY,
-            },
-        }
+        config = DEFAULT_CONFIGURATION.copy()
     return config
+
 
 def _write_config(config, config_path):
     path = os.path.expanduser(config_path)
     with open(path, mode='w') as config_file:
-        json.dump(config, config_file)
+        json.dump(config, config_file, sort_keys=True,
+                  indent=4, separators=(',', ': '))
 
 
 def create_schema(config=DEFAULT_CONFIG_PATH,
@@ -89,16 +99,17 @@ def _ask_with_default(name, default):
 
 def config(path=DEFAULT_CONFIG_PATH):
     database_url = _ask_with_default("Database URL", DEFAULT_DATABASE_URL)
-    api_key = _ask_with_default("Mandrill API Key", DEFAULT_MANDRILL_TEST_KEY)
+    username = _ask_with_default("Mandrill Username",
+                                 DEFAULT_MANDRILL_USERNAME)
+    api_key = _ask_with_default("Mandrill API Key",
+                                DEFAULT_MANDRILL_TEST_KEY)
 
-    config = {
-        'database': {
-            'url': database_url,
-        },
-        'email': {
-            'apiKey': api_key,
-        },
-    }
+    config = DEFAULT_CONFIGURATION.copy()
+    config.update({
+        'database.url': database_url,
+        'mail.user': username,
+        'mail.password': api_key,
+    })
     _write_config(config,
                   config_path=path)
 
@@ -146,7 +157,7 @@ def send_reminders(date_override=None,
         yield "Sending notifications for {}".format(when)
         for user in who:
             yield "Sending notification for: {}".format(user.email_address)
-            send_notification(user, when)
+            send_notification(cli_mailer, user, when)
         transaction.commit()
 
 

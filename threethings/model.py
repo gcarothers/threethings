@@ -93,7 +93,7 @@ class User(Base):
 
         all_users = Session.query(cls)
         for user in all_users:
-            if user.should_be_notified(when) or force:
+            if force or user.should_be_notified(when):
                 yield user
 
     def should_be_notified(self, when):

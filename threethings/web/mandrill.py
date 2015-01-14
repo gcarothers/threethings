@@ -10,6 +10,7 @@ from pyramid.view import (
 from pyramid.response import (
     Response,
 )
+from pyramid_mailer import get_mailer
 from ..model import (
     StatusUpdate,
 )
@@ -39,11 +40,12 @@ def webhook_allowed(request):
 def receive_email(request):
     mandrill_events = request.params['mandrill_events']
     email_json = json.loads(mandrill_events)
-    updates = process_inbound_email(email_json)
+    mailer = get_mailer(request)
+    updates = process_inbound_email(mailer, email_json)
     return list(updates)
 
 
-def process_inbound_email(email_json):
+def process_inbound_email(mailer, email_json):
     """Based on http://help.mandrill.com/entries/22092308-What-is-the-format-of-inbound-email-webhooks-
     process the incoming email."""
     for event in email_json:
@@ -55,5 +57,5 @@ def process_inbound_email(email_json):
         text = msg['text']
         html = msg['html']
         update = StatusUpdate.from_email(author, timestamp, text, html)
-        send_confirm(update.user)
+        send_confirm(mailer, update.user)
         yield update

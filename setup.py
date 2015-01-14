@@ -22,6 +22,8 @@ requirements = [
     'python-dateutil',
     'pyramid',
     'pyramid_tm',
+    'pyramid_mailer',
+    'repoze.sendmail == 4.1',
 ]
 
 test_requirements = [

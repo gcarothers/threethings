@@ -1,27 +1,9 @@
-import mandrill
-
-Client = None  # mandrill.Mandrill()
-
-
-def from_config(config):
-    global Client
-    Client = mandrill.Mandrill(config['apiKey'])
+from pyramid_mailer.message import (
+    Message,
+)
 
 
-def send_notification(user, for_week):
-    year, week_number, day_number = for_week.isocalendar()
-    message = {
-        'from_email': 'status-update@in.lexmachina.com',
-        'from_name': '3things Status Updates',
-        'tags': ['3things', 'status-update'],
-        'to': [
-            {
-                'email': user.email_address,
-            },
-        ],
-        'subject': 'Status Reminder for Week {} of {}'.format(week_number,
-                                                              year),
-        'text': """
+NOTIFICATION_TEMPLATE = """
 Hi,
 
 Please reply with your weekly status update! Three simple things that
@@ -29,36 +11,36 @@ you did last week, and three things your planning on doing next week.
 
 Cheers,
 Friendly Robot
-""",
-    }
-    results = Client.messages.send(message)
-    result = results[0]
-    if result['status'] != 'sent':
-        raise Exception("%r".format(result))
+"""
+
+FROM = '3things Status Updates <status-update@in.lexmachina.com>'
+
+
+def send_notification(mailer, user, for_week):
+    year, week_number, day_number = for_week.isocalendar()
+    subject = "Status Reminder for Week {} of {}".format(week_number,
+                                                         year)
+    message = Message(subject=subject,
+                      sender=FROM,
+                      recipients=[user.email_address],
+                      body=NOTIFICATION_TEMPLATE)
+    mailer.send(message)
     user.last_notified = for_week
-    return result
+    return message
 
 
-def send_confirm(user):
-    message = {
-        'from_email': 'status-update@in.lexmachina.com',
-        'from_name': '3things Status Updates',
-        'tags': ['3things', 'status-update'],
-        'to': [
-            {
-                'email': user.email_address,
-            },
-        ],
-        'subject': 'Got your update!',
-        'text': """
+CONFIRM_TEMPLATE = """
 Thanks! I've got it.
 
 Cheers,
 Friendly Robot
-""",
-    }
-    results = Client.messages.send(message)
-    result = results[0]
-    if result['status'] != 'sent':
-        raise Exception("%r".format(result))
-    return result
+"""
+
+
+def send_confirm(mailer, user):
+    message = Message(subject="Got your update!",
+                      sender=FROM,
+                      recipients=[user.email_address],
+                      body=CONFIRM_TEMPLATE)
+    mailer.send(message)
+    return message
