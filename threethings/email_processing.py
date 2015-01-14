@@ -37,10 +37,22 @@ Friendly Robot
 """
 
 
-def send_confirm(mailer, user):
-    message = Message(subject="Got your update!",
+def send_confirm(mailer, user, reply_to_id=None, reply_to_subject=None):
+    headers = {}
+
+    if reply_to_id is not None:
+        headers['In-Reply-To'] = reply_to_id
+
+    if reply_to_subject is not None:
+        subject = "Re: " + reply_to_subject
+    else:
+        subject = "Got your update!"
+
+    message = Message(subject=subject,
                       sender=FROM,
                       recipients=[user.email_address],
-                      body=CONFIRM_TEMPLATE)
+                      body=CONFIRM_TEMPLATE,
+                      extra_headers=headers,
+                      )
     mailer.send(message)
     return message

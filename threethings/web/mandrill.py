@@ -56,6 +56,12 @@ def process_inbound_email(mailer, email_json):
         author = msg['from_email']
         text = msg['text']
         html = msg['html']
+        subject = msg['subject']
+        message_id = msg['headers'].get('Message-Id')
         update = StatusUpdate.from_email(author, timestamp, text, html)
-        send_confirm(mailer, update.user)
+        send_confirm(mailer,
+                     update.user,
+                     reply_to_id=message_id,
+                     reply_to_subject=subject,
+                     )
         yield update
