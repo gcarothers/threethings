@@ -2,7 +2,7 @@ import os
 
 ENVIRON_SETTINGS_MAP = {
     'DATABASE_URL': 'sqlalchemy.url',
-    'SMTP_USER': 'mail.user',
+    'SMTP_USER': 'mail.username',
     'SMTP_PASSWORD': 'mail.password',
 }
 
