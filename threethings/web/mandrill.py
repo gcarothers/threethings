@@ -46,8 +46,7 @@ def receive_email(request):
 
 
 def process_inbound_email(mailer, email_json):
-    """Based on http://help.mandrill.com/entries/22092308-What-is-the-format-of-inbound-email-webhooks-
-    process the incoming email."""
+    """Based on http://goo.gl/vyeI69 process the incoming email."""
     for event in email_json:
         if event['event'] != 'inbound':
             raise ValueError('Unexpected event: {}'.format(event['event']))

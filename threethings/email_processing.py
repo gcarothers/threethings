@@ -56,3 +56,31 @@ def send_confirm(mailer, user, reply_to_id=None, reply_to_subject=None):
                       )
     mailer.send(message)
     return message
+
+
+WELCOME_MESSAGE_TEMPLATE = """
+Hi there!
+
+Welcome to the 3things status update email workflow awesomeness tool with
+power features. Every week you'll get an email from me asking you to tell
+me what what you've been doing this week, and what your planning on doing
+next week. Just reply to that email and I'll make sure to let everyone else
+on your team know what you've been up to.
+
+You can also send me an email at any time before I remind you! I'll keep
+track of all the emails you send me in a week and summarize them on Monday
+morning.
+
+See you next Friday!
+Friendly Robot
+"""
+
+
+def welcome_user(mailer, user):
+    message = Message(subject="Welcome to 3things!",
+                      sender=FROM,
+                      recipients=[user.email_address],
+                      body=WELCOME_MESSAGE_TEMPLATE,
+                      )
+    mailer.send(message)
+    return user

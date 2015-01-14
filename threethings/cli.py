@@ -21,6 +21,7 @@ from pyramid_mailer import (
 )
 from .email_processing import (
     send_notification,
+    welcome_user,
 )
 from dateutil.parser import (
     parse,
@@ -28,7 +29,7 @@ from dateutil.parser import (
 import pytz
 import transaction
 
-DEFAULT_DATABASE_URL = 'postgresql://threethings@127.0.0.1:5432/threethings-dev'
+DEFAULT_DATABASE_URL = 'postgresql://threethings@127.0.0.1:5432/threethings-dev'  # noqa
 DEFAULT_MANDRILL_USERNAME = 'username'
 DEFAULT_MANDRILL_TEST_KEY = 'HONFNmswdL6K075sBSk1-g'
 DEFAULT_CONFIG_PATH = '~/.config/3things.json'
@@ -123,6 +124,7 @@ def add_user(email_address,
         user.email_address = email_address
         user.timezone = timezone
         Session.add(user)
+        welcome_user(cli_mailer, user)
         transaction.commit()
     yield "Added: {}".format(email_address)
 

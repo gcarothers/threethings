@@ -21,7 +21,7 @@ import datetime
 
 import transaction
 
-from nose.tools import *
+from nose.tools import *  # noqa
 import testing.postgresql
 
 import logging

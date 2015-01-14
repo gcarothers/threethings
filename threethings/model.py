@@ -23,7 +23,11 @@ from functools import (
     partial,
 )
 import pytz
-import datetime
+
+from datetime import (
+    datetime,
+    timedelta,
+)
 
 import logging
 
@@ -32,7 +36,7 @@ log = logging.getLogger(__name__)
 Session = scoped_session(sessionmaker(extension=ZopeTransactionExtension()))
 Base = declarative_base()
 
-now = partial(datetime.datetime.now, tz=pytz.UTC)
+now = partial(datetime.now, tz=pytz.UTC)
 
 FRIDAY = 5
 
@@ -102,7 +106,7 @@ class User(Base):
             if self.is_after_expected_update_time(when):
                 log.debug("last_notified: %r", self.last_notified)
                 if self.last_notified is None or (when - self.last_notified >
-                                                  datetime.timedelta(hours=24)):
+                                                  timedelta(hours=24)):
                     if self.update_for_week(when).count() == 0:
                         return True
 
@@ -125,7 +129,7 @@ class User(Base):
             return False
 
     def in_localtime(self, when):
-        assert isinstance(when, datetime.datetime)
+        assert isinstance(when, datetime)
         tz = pytz.timezone(self.timezone)
         localtime = when.astimezone(tz)
         return localtime
