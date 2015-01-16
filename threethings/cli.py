@@ -38,7 +38,7 @@ DEFAULT_CONFIGURATION = {
     'sqlalchemy.url': DEFAULT_DATABASE_URL,
     'mail.host': 'smtp.mandrillapp.com',
     'mail.port': 2525,
-    'mail.ssl': True,
+    'mail.tls': True,
 }
 
 import logging
