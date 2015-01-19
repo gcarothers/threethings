@@ -173,7 +173,7 @@ ${update.text}
 %if len(users_without_updates) > 0:
 Sadly I didn't get updates from ${len(users_without_updates)} people:
 %for user in users_without_updates:
-${user.full_name} <${user.email_address}>:
+${user.full_name} <${user.email_address}>
 %endfor
 %endif
 
