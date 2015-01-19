@@ -13,6 +13,7 @@ history = open('HISTORY.rst').read().replace('.. :changelog:', '')
 
 requirements = [
     'argh',
+    'mako',
     'mandrill',
     'sqlalchemy',
     'pytz',

@@ -180,11 +180,7 @@ def display_updates(date_override=None,
     _setup_from_config(config)
     when = _when(date_override, timezone)
     summary = WeeklySummary(when)
-    yield "Updates:"
-    for update in summary.updates:
-        yield "User: " + update.user.email_address
-        yield update.text
-        yield "\n\n"
+    yield summary.email_contents()
 
 
 def _when(date_override, timezone):

@@ -22,6 +22,9 @@ from sqlalchemy.ext.declarative import (
 from functools import (
     partial,
 )
+from collections import (
+    defaultdict,
+)
 import pytz
 
 from datetime import (
@@ -64,6 +67,7 @@ class StatusUpdate(Base):
         q = Session.query(cls)
         q = q.filter(func.date_part('year', cls.when) == for_year)
         q = q.filter(func.date_part('week', cls.when) == for_week)
+        q = q.order_by(cls.when)
         return q
 
     @classmethod
@@ -88,6 +92,7 @@ class User(Base):
     __tablename__ = 'users'
 
     email_address = Column(Text, primary_key=True)
+    full_name = Column(Text, default="")
     timezone = Column(Text, nullable=False)
     notifications_on = Column(Boolean, nullable=False, default=True)
     last_notified = Column(DateTime(timezone=True))
@@ -155,12 +160,25 @@ class WeeklySummary(object):
 
 I've collected status updates from Week ${week} of ${year}!
 
-%for update in updates:
-${update.user.full_name} <${update.user.email_address}>:
+%for user, updates in updates_by_user.items():
+${user.full_name} <${user.email_address}>:
 
+  %for update in updates:
 ${update.text}
+  %endfor
+
 
 %endfor
+
+%if len(users_without_updates) > 0:
+Sadly I didn't get updates from ${len(users_without_updates)} people:
+%for user in users_without_updates:
+${user.full_name} <${user.email_address}>:
+%endfor
+%endif
+
+See you next Friday!
+Friendly Robot
 """)
 
     def __init__(self, when=None):
@@ -172,5 +190,17 @@ ${update.text}
         self.users_with_updates = {update.user for update in self.updates}
         self.users_without_updates = all_users - self.users_with_updates
 
+    def updates_by_user(self):
+        results = defaultdict(list)
+        for update in self.updates:
+            results[update.user].append(update)
+        return results
+
     def email_contents(self):
-        pass
+        for_year, for_week, week_day = self.when.isocalendar()
+        return self.SUMMARY_TEMPLATE.render(**{
+            'week': for_week,
+            'year': for_year,
+            'updates_by_user': self.updates_by_user(),
+            'users_without_updates': self.users_without_updates,
+        })
