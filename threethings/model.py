@@ -29,6 +29,8 @@ from datetime import (
     timedelta,
 )
 
+from mako.template import Template
+
 import logging
 
 log = logging.getLogger(__name__)
@@ -49,6 +51,12 @@ class StatusUpdate(Base):
     raw_text = Column(Text, nullable=False)
     raw_html = Column(Text, nullable=True)
     when = Column(DateTime(timezone=True), nullable=False, default=now)
+
+    @property
+    def text(self):
+        from email_reply_parser import EmailReplyParser
+        message = EmailReplyParser.read(self.raw_text)
+        return message.reply
 
     @classmethod
     def updates_in_week(cls, day_in_week):
@@ -143,5 +151,27 @@ class User(Base):
 
 class WeeklySummary(object):
 
-    def __init__(self, day_in_week=None):
+    SUMMARY_TEMPLATE = Template(
+"""Hi folks,
+
+I've collected status updates from Week ${week} of ${year}!
+
+%for update in updates:
+${update.user.full_name} <${update.user.email_address}>:
+
+${update.text}
+
+%endfor
+""")
+
+    def __init__(self, when=None):
+        self.when = when
+        self.updates = StatusUpdate.updates_in_week(when)
+
+        all_users = {user for user in User.all_users()}
+
+        self.users_with_updates = {update.user for update in self.updates}
+        self.users_without_updates = all_users - self.users_with_updates
+
+    def email_contents(self):
         pass

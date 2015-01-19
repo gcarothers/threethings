@@ -10,6 +10,7 @@ from .model import (
     Base,
     User,
     StatusUpdate,
+    WeeklySummary,
     now,
 )
 
@@ -163,17 +164,27 @@ def display_summary(date_override=None,
                     config=DEFAULT_CONFIG_PATH):
     _setup_from_config(config)
     when = _when(date_override, timezone)
-    updates = StatusUpdate.updates_in_week(when)
-
-    users_with_updates = {update.user for update in updates}
-    all_users = {user for user in User.all_users()}
+    summary = WeeklySummary(when)
     yield "Users with updates:"
-    for user in users_with_updates:
+    for user in summary.users_with_updates:
         yield "* " + user.email_address
     yield "----"
     yield "Users missing updates:"
-    for user in all_users - users_with_updates:
+    for user in summary.users_without_updates:
         yield "* " + user.email_address
+
+
+def display_updates(date_override=None,
+                    timezone="UTC",
+                    config=DEFAULT_CONFIG_PATH):
+    _setup_from_config(config)
+    when = _when(date_override, timezone)
+    summary = WeeklySummary(when)
+    yield "Updates:"
+    for update in summary.updates:
+        yield "User: " + update.user.email_address
+        yield update.text
+        yield "\n\n"
 
 
 
@@ -196,6 +207,7 @@ parser.add_commands([
     create_schema,
     send_reminders,
     display_summary,
+    display_updates,
 ])
 
 
