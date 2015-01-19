@@ -91,6 +91,11 @@ class User(Base):
         return "<{}('{}')>".format(cls_name, self.email_address)
 
     @classmethod
+    def all_users(cls):
+        all_users = Session.query(cls)
+        return all_users
+
+    @classmethod
     def to_notify(cls, when=None, force=False):
         if when is None:
             when = now()

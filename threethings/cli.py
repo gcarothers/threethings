@@ -9,6 +9,7 @@ from .model import (
     Session,
     Base,
     User,
+    StatusUpdate,
     now,
 )
 
@@ -147,13 +148,7 @@ def send_reminders(date_override=None,
                    timezone="UTC",
                    config=DEFAULT_CONFIG_PATH):
     _setup_from_config(config)
-    if date_override is not None:
-        when = parse(date_override)
-        if when.tzinfo is None:
-            zone = pytz.timezone(timezone)
-            when = zone.localize(when)
-    else:
-        when = now()
+    when = _when(date_override, timezone)
     with transaction.manager:
         who = User.to_notify(when, force=force)
         yield "Sending notifications for {}".format(when)
@@ -163,6 +158,36 @@ def send_reminders(date_override=None,
         transaction.commit()
 
 
+def display_summary(date_override=None,
+                    timezone="UTC",
+                    config=DEFAULT_CONFIG_PATH):
+    _setup_from_config(config)
+    when = _when(date_override, timezone)
+    updates = StatusUpdate.updates_in_week(when)
+
+    users_with_updates = {update.user for update in updates}
+    all_users = {user for user in User.all_users()}
+    yield "Users with updates:"
+    for user in users_with_updates:
+        yield "* " + user.email_address
+    yield "----"
+    yield "Users missing updates:"
+    for user in all_users - users_with_updates:
+        yield "* " + user.email_address
+
+
+
+def _when(date_override, timezone):
+    if date_override is not None:
+        when = parse(date_override)
+        if when.tzinfo is None:
+            zone = pytz.timezone(timezone)
+            when = zone.localize(when)
+    else:
+        when = now()
+    return when
+
+
 parser = argh.ArghParser()
 parser.add_commands([
     add_user,
@@ -170,6 +195,7 @@ parser.add_commands([
     remove_user,
     create_schema,
     send_reminders,
+    display_summary,
 ])
 
 
