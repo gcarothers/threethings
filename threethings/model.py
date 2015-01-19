@@ -116,6 +116,7 @@ class User(Base):
                         return True
 
     def update_for_week(self, when):
+        when = self.in_localtime(when)
         q = StatusUpdate.updates_in_week(when)
         q = q.join(self.__class__)
         q = q.filter(self.__class__.email_address == self.email_address)
