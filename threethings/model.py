@@ -151,8 +151,7 @@ class User(Base):
 
 class WeeklySummary(object):
 
-    SUMMARY_TEMPLATE = Template(
-"""Hi folks,
+    SUMMARY_TEMPLATE = Template("""Hi folks,
 
 I've collected status updates from Week ${week} of ${year}!
 

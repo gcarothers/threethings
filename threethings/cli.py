@@ -9,7 +9,6 @@ from .model import (
     Session,
     Base,
     User,
-    StatusUpdate,
     WeeklySummary,
     now,
 )
@@ -25,6 +24,7 @@ from .email_processing import (
     send_notification,
     welcome_user,
 )
+
 from dateutil.parser import (
     parse,
 )
@@ -185,7 +185,6 @@ def display_updates(date_override=None,
         yield "User: " + update.user.email_address
         yield update.text
         yield "\n\n"
-
 
 
 def _when(date_override, timezone):

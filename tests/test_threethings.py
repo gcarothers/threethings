@@ -134,6 +134,7 @@ def test_notify_on_only_those_without_status_for_week():
     to_be_notified = list(User.to_notify(dt))
     eq_(len(to_be_notified), 1)
 
+
 def did_status_update_hours_ago(dt, hours, user):
     user = Session.query(User).get(user)
     update = StatusUpdate()
