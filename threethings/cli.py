@@ -87,6 +87,7 @@ def _write_config(config, config_path):
 
 def create_schema(config=DEFAULT_CONFIG_PATH,
                   reset=False):
+    """Create all required tables in database"""
     _setup_from_config(config)
     if reset:
         Base.metadata.drop_all()
@@ -101,6 +102,7 @@ def _ask_with_default(name, default):
 
 
 def config(path=DEFAULT_CONFIG_PATH):
+    """Interactive creation of configuration file"""
     database_url = _ask_with_default("Database URL", DEFAULT_DATABASE_URL)
     username = _ask_with_default("Mandrill Username",
                                  DEFAULT_MANDRILL_USERNAME)
@@ -118,12 +120,16 @@ def config(path=DEFAULT_CONFIG_PATH):
 
 
 def add_user(email_address,
+             full_name,
              timezone='America/Los_Angeles',
              config=DEFAULT_CONFIG_PATH):
+    """Add a 3things user to be notified. Timezone sets when they should be
+    notified by email."""
     _setup_from_config(config)
     with transaction.manager:
         user = User()
         user.email_address = email_address
+        user.full_name = full_name
         user.timezone = timezone
         Session.add(user)
         welcome_user(cli_mailer, user)
@@ -133,6 +139,7 @@ def add_user(email_address,
 
 def remove_user(email_address,
                 config=DEFAULT_CONFIG_PATH):
+    """Remove a user (and their status updates) from 3things"""
     _setup_from_config(config)
     with transaction.manager:
         user = Session.query(User).get(email_address)
@@ -148,6 +155,7 @@ def send_reminders(date_override=None,
                    force=False,
                    timezone="UTC",
                    config=DEFAULT_CONFIG_PATH):
+    """Cron-able command for sending reminders to users if it's time to"""
     _setup_from_config(config)
     when = _when(date_override, timezone)
     with transaction.manager:
@@ -162,6 +170,7 @@ def send_reminders(date_override=None,
 def display_summary(date_override=None,
                     timezone="UTC",
                     config=DEFAULT_CONFIG_PATH):
+    """Display a summary of updates for the current week"""
     _setup_from_config(config)
     when = _when(date_override, timezone)
     summary = WeeklySummary(when)
@@ -177,6 +186,7 @@ def display_summary(date_override=None,
 def display_updates(date_override=None,
                     timezone="UTC",
                     config=DEFAULT_CONFIG_PATH):
+    """Display a copy of the normal summary email for the week"""
     _setup_from_config(config)
     when = _when(date_override, timezone)
     summary = WeeklySummary(when)
