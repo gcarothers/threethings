@@ -7,7 +7,7 @@ NOTIFICATION_TEMPLATE = """
 Hi,
 
 Please reply with your weekly status update! Three simple things that
-you did last week, and three things your planning on doing next week.
+you did last week, and three things you're planning on doing next week.
 
 Cheers,
 Friendly Robot
