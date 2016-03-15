@@ -8,7 +8,6 @@ from sqlalchemy import (
     ForeignKey,
     DateTime,
     Boolean,
-    func,
 )
 from sqlalchemy.orm import (
     scoped_session,
