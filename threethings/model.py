@@ -65,16 +65,14 @@ class StatusUpdate(Base):
     @classmethod
     def updates_in_week(cls, day_in_week):
         for_year, for_week, week_day = day_in_week.isocalendar()
-        # offset to include monday till 1700 utc (10 am PDT)
+        # Offset to include monday till 1700 utc (10 am PDT)
         # after day_in_week's isoweek.
         # This is intended to catch any last minute updates
-        # it's assumed users will not send in new updates on a monday
+        # It's assumed users will not send in new updates on a monday
+        # And assumes mail will be automatically delivered at 10 am PDT
         start_date = day_in_week - timedelta(days=(week_day - 1))
         padded_start_date = start_date + timedelta(days=1, hours=17, seconds=1)
         end_date = start_date + timedelta(days=7, hours=17)
-        import pdb
-        pdb.set_trace()
-
 
         q = Session.query(cls)
         q = q.filter(and_(
