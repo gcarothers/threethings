@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from sqlalchemy import (
+    and_,
     Column,
     Integer,
     Text,
@@ -64,10 +65,23 @@ class StatusUpdate(Base):
     @classmethod
     def updates_in_week(cls, day_in_week):
         for_year, for_week, week_day = day_in_week.isocalendar()
+        # offset to include monday till 1700 utc (10 am PDT)
+        # after day_in_week's isoweek.
+        # This is intended to catch any last minute updates
+        # it's assumed users will not send in new updates on a monday
+        start_date = day_in_week - timedelta(days=(week_day - 1))
+        padded_start_date = start_date + timedelta(days=1, hours=17, seconds=1)
+        end_date = start_date + timedelta(days=7, hours=17)
+        import pdb
+        pdb.set_trace()
+
+
         q = Session.query(cls)
-        q = q.filter(func.date_part('year', cls.when) == for_year)
-        q = q.filter(func.date_part('week', cls.when) == for_week)
-        q = q.order_by(cls.when)
+        q = q.filter(and_(
+            cls.when >= padded_start_date,
+            cls.when <= end_date,
+        ))
+
         return q
 
     @classmethod
