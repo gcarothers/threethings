@@ -37,7 +37,7 @@ DEFAULT_MANDRILL_TEST_KEY = 'HONFNmswdL6K075sBSk1-g'
 DEFAULT_CONFIG_PATH = '~/.config/3things.json'
 
 DEFAULT_CONFIGURATION = {
-    'sqlalchemy.url': DEFAULT_DATABASE_URL,
+    'database.url': DEFAULT_DATABASE_URL,
     'mail.host': 'smtp.mandrillapp.com',
     'mail.port': 2525,
     'mail.tls': True,
@@ -60,7 +60,7 @@ def _setup_from_config(config_path):
     from sqlalchemy import engine_from_config
     config = _load_config(config_path)
     load_settings_from_environ(config, ENVIRON_SETTINGS_MAP)
-    engine = engine_from_config(config, prefix='sqlalchemy.')
+    engine = engine_from_config(config, prefix='database.')
     Session.configure(bind=engine)
     Base.metadata.bind = engine
 
