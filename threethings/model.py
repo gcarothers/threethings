@@ -80,6 +80,8 @@ class StatusUpdate(Base):
             cls.when <= end_date,
         ))
 
+        q = q.order_by(cls.when)
+
         return q
 
     @classmethod
