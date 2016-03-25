@@ -2,6 +2,10 @@
 import os.path
 import argh
 import json
+import logging
+import pytz
+import transaction
+
 from argh import (
     safe_input,
 )
@@ -28,8 +32,7 @@ from .email_processing import (
 from dateutil.parser import (
     parse,
 )
-import pytz
-import transaction
+
 
 DEFAULT_DATABASE_URL = 'postgresql://threethings@127.0.0.1:5432/threethings-dev'  # noqa
 DEFAULT_MANDRILL_USERNAME = 'username'
@@ -43,7 +46,6 @@ DEFAULT_CONFIGURATION = {
     'mail.tls': True,
 }
 
-import logging
 logging.basicConfig(level=logging.DEBUG)
 
 cli_mailer = None

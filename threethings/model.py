@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 
 from sqlalchemy import (
+    and_,
     Column,
     Integer,
     Text,
     ForeignKey,
     DateTime,
     Boolean,
-    func,
 )
 from sqlalchemy.orm import (
     scoped_session,
@@ -64,10 +64,23 @@ class StatusUpdate(Base):
     @classmethod
     def updates_in_week(cls, day_in_week):
         for_year, for_week, week_day = day_in_week.isocalendar()
+        # Offset to include monday till 1700 utc (10 am PDT)
+        # after day_in_week's isoweek.
+        # This is intended to catch any last minute updates
+        # It's assumed users will not send in new updates on a monday
+        # And assumes mail will be automatically delivered at 10 am PDT
+        start_date = day_in_week - timedelta(days=(week_day - 1))
+        padded_start_date = start_date + timedelta(days=1, hours=17, seconds=1)
+        end_date = start_date + timedelta(days=7, hours=17)
+
         q = Session.query(cls)
-        q = q.filter(func.date_part('year', cls.when) == for_year)
-        q = q.filter(func.date_part('week', cls.when) == for_week)
+        q = q.filter(and_(
+            cls.when >= padded_start_date,
+            cls.when <= end_date,
+        ))
+
         q = q.order_by(cls.when)
+
         return q
 
     @classmethod
