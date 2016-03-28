@@ -9,6 +9,9 @@ import transaction
 from argh import (
     safe_input,
 )
+
+from sqlalchemy import update
+
 from .model import (
     Session,
     Base,
@@ -151,6 +154,23 @@ def remove_user(email_address,
             yield "Removed: {}".format(email_address)
         else:
             yield "No such user: {}".format(email_address)
+
+
+def mute_user(email_address, config=DEFAULT_CONFIG_PATH):
+    """Set users.notifications_on to False"""
+    _setup_from_config(config)
+    with transaction.manager:
+        mute_user = Session.query(User).get(email_address)
+        if user:
+            mute_user = update(users).where(
+                    users.email_address==email_address
+                )./
+                values(notificaions_on=False)
+            transaction.commit()
+            yield "Muted: {}".fomat(email_address)
+        else:
+            yield "No such user: {}".format(email_address)
+
 
 
 def send_reminders(date_override=None,
