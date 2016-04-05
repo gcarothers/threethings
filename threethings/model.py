@@ -70,7 +70,7 @@ class StatusUpdate(Base):
         # It's assumed users will not send in new updates on a monday
         # And assumes mail will be automatically delivered at 10 am PDT
         start_date = day_in_week - timedelta(days=(week_day - 1))
-        padded_start_date = start_date + timedelta(days=1, hours=17, seconds=1)
+        padded_start_date = start_date + timedelta(days=0, hours=17, seconds=1)
         end_date = start_date + timedelta(days=7, hours=17)
 
         q = Session.query(cls)
