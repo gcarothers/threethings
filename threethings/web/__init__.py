@@ -27,4 +27,5 @@ def main(global_config, **settings):
     config.include('pyramid_tm')
     config.include('pyramid_mailer')
     config.include('.mandrill', route_prefix="/mandrill")
+    config.include('.mailgun', route_prefix="/mailgun")
     return config.make_wsgi_app()

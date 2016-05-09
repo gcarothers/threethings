@@ -35,8 +35,8 @@ from dateutil.parser import (
 
 
 DEFAULT_DATABASE_URL = 'postgresql://threethings@127.0.0.1:5432/threethings-dev'  # noqa
-DEFAULT_MANDRILL_USERNAME = 'username'
-DEFAULT_MANDRILL_TEST_KEY = 'HONFNmswdL6K075sBSk1-g'
+DEFAULT_MAILER_USERNAME = 'username'
+DEFAULT_MAILER_TEST_KEY = 'HONFNmswdL6K075sBSk1-g'
 DEFAULT_CONFIG_PATH = '~/.config/3things.json'
 
 DEFAULT_CONFIGURATION = {
@@ -106,10 +106,10 @@ def _ask_with_default(name, default):
 def config(path=DEFAULT_CONFIG_PATH):
     """Interactive creation of configuration file"""
     database_url = _ask_with_default("Database URL", DEFAULT_DATABASE_URL)
-    username = _ask_with_default("Mandrill Username",
-                                 DEFAULT_MANDRILL_USERNAME)
-    api_key = _ask_with_default("Mandrill API Key",
-                                DEFAULT_MANDRILL_TEST_KEY)
+    username = _ask_with_default("Mailer Username",
+                                 DEFAULT_MAILER_USERNAME)
+    api_key = _ask_with_default("Mailer API Key",
+                                DEFAULT_MAILER_TEST_KEY)
 
     config = DEFAULT_CONFIGURATION.copy()
     config.update({

@@ -25,7 +25,7 @@ log = logging.getLogger(__name__)
 
 def includeme(config):
     config.add_route('mailgun_landing', '/')
-    config.add_route('mailgun_receiving', '/receive')
+    config.add_route('mailgun_receiving', '/receive2')
     config.scan()
 
 
