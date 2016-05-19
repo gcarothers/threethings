@@ -39,7 +39,9 @@ def webhook_allowed(request):
 def receive_email(request):
     mailgun_events = request.params.dict_of_lists()
     email_headers = {}
-    email_header_thing = json.loads(request.params.getall('message-headers')[0])
+    email_header_thing = json.loads(
+        request.params.getall('message-headers')[0]
+    )
     for i in email_header_thing:
         email_headers[i[0]] = i[1].strip('>').strip('<')
 
