@@ -103,7 +103,6 @@ def _ask_with_default(name, default):
     return result
 
 
-# TODO make sure this works with mailgun
 def config(path=DEFAULT_CONFIG_PATH):
     """Interactive creation of configuration file"""
     database_url = _ask_with_default("Database URL", DEFAULT_DATABASE_URL)
@@ -113,16 +112,17 @@ def config(path=DEFAULT_CONFIG_PATH):
                                 DEFAULT_MAILER_TEST_KEY)
 
     config = DEFAULT_CONFIGURATION.copy()
+    # NOTE - mandill used 'user' Mailgun wants 'username'
+    # TODO make this configureable?  or set both?
     config.update({
         'database.url': database_url,
-        'mail.user': username,
+        'mail.username': username,
         'mail.password': api_key,
     })
     _write_config(config,
                   config_path=path)
 
 
-# TODO test
 def add_user(email_address,
              full_name,
              timezone='America/Los_Angeles',
@@ -141,7 +141,6 @@ def add_user(email_address,
     yield "Added: {}".format(email_address)
 
 
-# TODO test
 def remove_user(email_address,
                 config=DEFAULT_CONFIG_PATH):
     """Remove a user (and their status updates) from 3things"""
@@ -173,7 +172,6 @@ def send_reminders(date_override=None,
         transaction.commit()
 
 
-# TODO test
 def display_summary(date_override=None,
                     timezone="UTC",
                     config=DEFAULT_CONFIG_PATH):
@@ -190,7 +188,6 @@ def display_summary(date_override=None,
         yield "* " + user.email_address
 
 
-# TODO test
 def display_updates(date_override=None,
                     timezone="UTC",
                     config=DEFAULT_CONFIG_PATH):
