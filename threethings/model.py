@@ -198,7 +198,7 @@ Friendly Robot
         self.when = when
         self.updates = StatusUpdate.updates_in_week(when)
 
-        # this should listin to mute
+        # this should listen to mute
         all_users = {user for user in User.all_users()}
 
         self.users_with_updates = {update.user for update in self.updates}

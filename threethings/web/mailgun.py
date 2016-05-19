@@ -43,9 +43,11 @@ def receive_email(request):
         request.params.getall('message-headers')[0]
     )
     for i in email_header_thing:
-        email_headers[i[0]] = i[1].strip('>').strip('<')
+        email_headers[i[0]] = i[1]
 
-    mailgun_events["parsed_message_id"] = email_headers.get('Message-Id')
+    mailgun_events["parsed_message_id"] = email_headers.get(
+        'Message-Id'
+    ).strip('>').strip('<')
 
     mailer = get_mailer(request)
     updates = process_inbound_email(mailer, mailgun_events)

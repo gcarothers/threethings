@@ -33,7 +33,7 @@ from dateutil.parser import (
     parse,
 )
 
-
+# TODO how to set usefull values here?
 DEFAULT_DATABASE_URL = 'postgresql://threethings@127.0.0.1:5432/threethings-dev'  # noqa
 DEFAULT_MAILER_USERNAME = 'username'
 DEFAULT_MAILER_TEST_KEY = 'HONFNmswdL6K075sBSk1-g'
@@ -41,8 +41,8 @@ DEFAULT_CONFIG_PATH = '~/.config/3things.json'
 
 DEFAULT_CONFIGURATION = {
     'database.url': DEFAULT_DATABASE_URL,
-    'mail.host': 'smtp.mandrillapp.com',
-    'mail.port': 2525,
+    'mail.host': 'smtp.mailgun.org',
+    'mail.port': 587,
     'mail.tls': True,
 }
 
@@ -103,6 +103,7 @@ def _ask_with_default(name, default):
     return result
 
 
+# TODO make sure this works with mailgun
 def config(path=DEFAULT_CONFIG_PATH):
     """Interactive creation of configuration file"""
     database_url = _ask_with_default("Database URL", DEFAULT_DATABASE_URL)
@@ -121,6 +122,7 @@ def config(path=DEFAULT_CONFIG_PATH):
                   config_path=path)
 
 
+# TODO test
 def add_user(email_address,
              full_name,
              timezone='America/Los_Angeles',
@@ -139,6 +141,7 @@ def add_user(email_address,
     yield "Added: {}".format(email_address)
 
 
+# TODO test
 def remove_user(email_address,
                 config=DEFAULT_CONFIG_PATH):
     """Remove a user (and their status updates) from 3things"""
@@ -153,6 +156,7 @@ def remove_user(email_address,
             yield "No such user: {}".format(email_address)
 
 
+# TODO test
 def send_reminders(date_override=None,
                    force=False,
                    timezone="UTC",
@@ -169,6 +173,7 @@ def send_reminders(date_override=None,
         transaction.commit()
 
 
+# TODO test
 def display_summary(date_override=None,
                     timezone="UTC",
                     config=DEFAULT_CONFIG_PATH):
@@ -185,6 +190,7 @@ def display_summary(date_override=None,
         yield "* " + user.email_address
 
 
+# TODO test
 def display_updates(date_override=None,
                     timezone="UTC",
                     config=DEFAULT_CONFIG_PATH):
