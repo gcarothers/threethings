@@ -19,7 +19,6 @@ from ..email_processing import (
 )
 
 import logging
-
 log = logging.getLogger(__name__)
 
 
@@ -38,37 +37,33 @@ def webhook_allowed(request):
              request_method='POST',
              renderer='json')
 def receive_email(request):
-    mailgun_events = {}
-    for i in request.params:
-        try:
-            mailgun_events[i] = request.params[i]
-        except TypeError, e:
-            log.error("------ {}".format(e))
-            pass
-        except:
-            pass
-    mailgun_events_json = json.dumps(mailgun_events)
-    email_json = json.loads(mailgun_events_json)
+    mailgun_events = request.params.dict_of_lists()
+    email_headers = {}
+    email_header_thing = json.loads(request.params.getall('message-headers')[0])
+    for i in email_header_thing:
+        email_headers[i[0]] = i[1].strip('>').strip('<')
+
+    mailgun_events["parsed_message_id"] = email_headers.get('Message-Id')
+
     mailer = get_mailer(request)
-    updates = process_inbound_email(mailer, email_json)
+    updates = process_inbound_email(mailer, mailgun_events)
+
     return list(updates)
 
 
 def process_inbound_email(mailer, email_json):
-    log.info("------ doing a thing for {}".format(email_json['from']))
     timestamp = datetime.datetime.fromtimestamp(
-        float(email_json['timestamp']), tz=pytz.UTC
+        float(email_json['timestamp'][0]), tz=pytz.UTC
     )
-    author = email_json['sender']
-    text = email_json['body-plain']
-    html = email_json['body-html']
-    subject = email_json['subject']
-    # this is typed as a unicode and cant index correctly?
-    # message_id = email_json['message-headers'].get('Message-Id')
+    author = email_json['sender'][0]
+    text = email_json['body-plain'][0]
+    html = email_json['body-html'][0]
+    subject = email_json['subject'][0]
+    message_id = email_json["parsed_message_id"]
     update = StatusUpdate.from_email(author, timestamp, text, html)
     send_confirm(mailer,
                  update.user,
-                 #reply_to_id=reply_to,
+                 reply_to_id=message_id,
                  reply_to_subject=subject,
                  )
     yield update

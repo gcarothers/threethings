@@ -2,6 +2,10 @@ from pyramid_mailer.message import (
     Message,
 )
 
+import logging
+
+log = logging.getLogger(__name__)
+
 
 NOTIFICATION_TEMPLATE = """
 Hi,
@@ -13,7 +17,9 @@ Cheers,
 Friendly Robot
 """
 
-FROM = '3things Status Updates <status-update@in.lexmachina.com>'
+# TODO make this configurable
+#FROM = '3things Status Updates <status-update@in.lexmachina.com>'
+FROM = 'postmaster@mg2.lexmachina.com'
 
 
 def send_notification(mailer, user, for_week):
@@ -38,6 +44,7 @@ Friendly Robot
 
 
 def send_confirm(mailer, user, reply_to_id=None, reply_to_subject=None):
+
     headers = {}
 
     if reply_to_id is not None:
