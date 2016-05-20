@@ -65,6 +65,13 @@ def parse_mailgun_event(request):
 
 
 def process_inbound_email(mailer, email_json):
+    # mailgun delivers a response, we don't need to process.
+    # response conains the key 'event' while incoming msg
+    # does not.
+    if 'event' in email_json:
+        raise ValueError(
+            'Unexpected event: {}'.format(email_json['event'])
+        )
     timestamp = datetime.datetime.fromtimestamp(
         float(email_json['timestamp'][0]), tz=pytz.UTC
     )
