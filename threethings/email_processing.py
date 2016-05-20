@@ -7,7 +7,7 @@ log = logging.getLogger(__name__)
 
 # TODO make this configurable
 # FROM = '3things Status Updates <status-update@in.lexmachina.com>'
-FROM = 'status-update@mg2.lexmachina.com'
+FROM = '3things Status Updates <status-update@mg2.lexmachina.com>'
 
 NOTIFICATION_TEMPLATE = """
 Hi,
