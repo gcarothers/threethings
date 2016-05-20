@@ -59,7 +59,7 @@ def parse_mailgun_event(request):
         email_headers[i[0]] = i[1]
     parsed_mailgun_event["parsed_message_id"] = email_headers.get(
         'Message-Id'
-    ).strip('>').strip('<')
+    )
 
     return parsed_mailgun_event
 
