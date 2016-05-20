@@ -36,22 +36,32 @@ def webhook_allowed(request):
              request_method='POST',
              renderer='json')
 def receive_email(request):
-    mailgun_events = request.params.dict_of_lists()
-    email_headers = {}
-    email_header_thing = json.loads(
-        request.params.getall('message-headers')[0]
-    )
-    for i in email_header_thing:
-        email_headers[i[0]] = i[1]
-
-    mailgun_events["parsed_message_id"] = email_headers.get(
-        'Message-Id'
-    ).strip('>').strip('<')
-
+    mailgun_events = parse_mailgun_event(request)
     mailer = get_mailer(request)
     updates = process_inbound_email(mailer, mailgun_events)
 
     return list(updates)
+
+
+def parse_mailgun_event(request):
+    """
+        Mailgun returns a WebOb multiNestedDict pile of goo.
+        Take each key/value and crate a corresponding key/value
+        Get Message-Id out of headers for use later.
+    """
+    parsed_mailgun_event = request.params.dict_of_lists()
+    email_headers = {}
+    mailgun_header = json.loads(
+        request.params.getall('message-headers')[0]
+    )
+    # iterate to parse out message_id
+    for i in mailgun_header:
+        email_headers[i[0]] = i[1]
+    parsed_mailgun_event["parsed_message_id"] = email_headers.get(
+        'Message-Id'
+    ).strip('>').strip('<')
+
+    return parsed_mailgun_event
 
 
 def process_inbound_email(mailer, email_json):
