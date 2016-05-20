@@ -45,9 +45,9 @@ def receive_email(request):
 
 def parse_mailgun_event(request):
     """
-        Mailgun returns a WebOb multiNestedDict pile of goo.
+        Mailgun returns a WebOb NestedMultiDict pile of goo.
         Take each key/value and crate a corresponding key/value
-        Get Message-Id out of headers for use later.
+        Get Message-Id out of message-headers for use later.
     """
     parsed_mailgun_event = request.params.dict_of_lists()
     email_headers = {}
