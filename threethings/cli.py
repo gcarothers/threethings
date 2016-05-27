@@ -36,16 +36,16 @@ from dateutil.parser import (
     parse,
 )
 
-
+# TODO how to set usefull values here?
 DEFAULT_DATABASE_URL = 'postgresql://threethings@127.0.0.1:5432/threethings-dev'  # noqa
-DEFAULT_MANDRILL_USERNAME = 'username'
-DEFAULT_MANDRILL_TEST_KEY = 'HONFNmswdL6K075sBSk1-g'
+DEFAULT_MAILER_USERNAME = 'username'
+DEFAULT_MAILER_TEST_KEY = 'HONFNmswdL6K075sBSk1-g'
 DEFAULT_CONFIG_PATH = '~/.config/3things.json'
 
 DEFAULT_CONFIGURATION = {
     'database.url': DEFAULT_DATABASE_URL,
-    'mail.host': 'smtp.mandrillapp.com',
-    'mail.port': 2525,
+    'mail.host': 'smtp.mailgun.org',
+    'mail.port': 587,
     'mail.tls': True,
 }
 
@@ -109,15 +109,17 @@ def _ask_with_default(name, default):
 def config(path=DEFAULT_CONFIG_PATH):
     """Interactive creation of configuration file"""
     database_url = _ask_with_default("Database URL", DEFAULT_DATABASE_URL)
-    username = _ask_with_default("Mandrill Username",
-                                 DEFAULT_MANDRILL_USERNAME)
-    api_key = _ask_with_default("Mandrill API Key",
-                                DEFAULT_MANDRILL_TEST_KEY)
+    username = _ask_with_default("Mailer Username",
+                                 DEFAULT_MAILER_USERNAME)
+    api_key = _ask_with_default("Mailer API Key",
+                                DEFAULT_MAILER_TEST_KEY)
 
     config = DEFAULT_CONFIGURATION.copy()
+    # NOTE - mandill used 'user' Mailgun wants 'username'
+    # TODO make this configureable?  or set both?
     config.update({
         'database.url': database_url,
-        'mail.user': username,
+        'mail.username': username,
         'mail.password': api_key,
     })
     _write_config(config,
@@ -173,6 +175,7 @@ def mute_user(email_address, config=DEFAULT_CONFIG_PATH):
 
 
 
+# TODO test
 def send_reminders(date_override=None,
                    force=False,
                    timezone="UTC",

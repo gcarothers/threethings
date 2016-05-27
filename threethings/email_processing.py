@@ -2,6 +2,12 @@ from pyramid_mailer.message import (
     Message,
 )
 
+import logging
+log = logging.getLogger(__name__)
+
+# TODO make this configurable
+# FROM = '3things Status Updates <status-update@in.lexmachina.com>'
+FROM = '3things Status Updates <status-update@mg2.lexmachina.com>'
 
 NOTIFICATION_TEMPLATE = """
 Hi,
@@ -12,8 +18,6 @@ you did last week, and three things you're planning on doing next week.
 Cheers,
 Friendly Robot
 """
-
-FROM = '3things Status Updates <status-update@in.lexmachina.com>'
 
 
 def send_notification(mailer, user, for_week):
