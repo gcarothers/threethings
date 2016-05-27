@@ -122,6 +122,12 @@ class User(Base):
         return all_users
 
     @classmethod
+    def woke_users(cls):
+        woke_users = Session.query(cls)
+        woke_users = woke_users.filter(cls.notifications_on)
+        return woke_users
+
+    @classmethod
     def to_notify(cls, when=None, force=False):
         if when is None:
             when = now()
@@ -198,11 +204,10 @@ Friendly Robot
         self.when = when
         self.updates = StatusUpdate.updates_in_week(when)
 
-        # this should listen to mute
-        all_users = {user for user in User.all_users()}
+        woke_users = {user for user in User.woke_users()}
 
         self.users_with_updates = {update.user for update in self.updates}
-        self.users_without_updates = all_users - self.users_with_updates
+        self.users_without_updates = woke_users - self.users_with_updates
 
     def updates_by_user(self):
         results = defaultdict(list)

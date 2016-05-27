@@ -9,6 +9,7 @@ import transaction
 from argh import (
     safe_input,
 )
+
 from .model import (
     Session,
     Base,
@@ -34,7 +35,7 @@ from dateutil.parser import (
 )
 
 # TODO how to set usefull values here?
-DEFAULT_DATABASE_URL = 'postgresql://threethings@127.0.0.1:5432/threethings-dev'  # noqa
+DEFAULT_DATABASE_URL = 'postgresql://threethings:test123@127.0.0.1:5432/local_threethings'  # noqa
 DEFAULT_MAILER_USERNAME = 'username'
 DEFAULT_MAILER_TEST_KEY = 'HONFNmswdL6K075sBSk1-g'
 DEFAULT_CONFIG_PATH = '~/.config/3things.json'
@@ -155,7 +156,38 @@ def remove_user(email_address,
             yield "No such user: {}".format(email_address)
 
 
-# TODO test
+def mute_user(email_address, config=DEFAULT_CONFIG_PATH):
+    """Set user.notifications_on to False"""
+    _setup_from_config(config)
+    with transaction.manager:
+        user = Session.query(User).get(email_address)
+        if user:
+            if user.notifications_on:
+                user.notifications_on = False
+                transaction.commit()
+                yield "Muted: {}".format(email_address)
+            else:
+                yield "{} already muted".format(email_address)
+        else:
+            yield "No such user: {}".format(email_address)
+
+
+def unmute_user(email_address, config=DEFAULT_CONFIG_PATH):
+    """Set user.notifications_on to True"""
+    _setup_from_config(config)
+    with transaction.manager:
+        user = Session.query(User).get(email_address)
+        if user:
+            if not user.notifications_on:
+                user.notifications_on = True
+                transaction.commit()
+                yield "Unmuted: {}".format(email_address)
+            else:
+                yield "{} not muted".format(email_address)
+        else:
+            yield "No such user: {}".format(email_address)
+
+
 def send_reminders(date_override=None,
                    force=False,
                    timezone="UTC",
@@ -218,6 +250,8 @@ parser.add_commands([
     send_reminders,
     display_summary,
     display_updates,
+    mute_user,
+    unmute_user,
 ])
 
 
