@@ -188,7 +188,6 @@ def unmute_user(email_address, config=DEFAULT_CONFIG_PATH):
             yield "No such user: {}".format(email_address)
 
 
-# TODO test
 def send_reminders(date_override=None,
                    force=False,
                    timezone="UTC",
